@@ -1,0 +1,60 @@
+
+### This function combines rows for a unique ID.  It assumes that your ID/Key is in column 1, and for every record with that id,
+### for the chosen column, it combines the different values for that column into one field, checking to make sure that the value
+### isn't already in that field.
+
+addColumn <- function(resultframe, startframe, origcolumn){
+  count <- 1
+  records <- length(resultframe[,1])
+  toadd <- ncol(resultframe) +1
+  resultframe[,toadd] <- "ADD"
+  
+  colnames(resultframe)[1] <- "id" 
+  colnames(resultframe)[origcolumn] <- "added" 
+  statetable <- data.frame(startframe[1], startframe[origcolumn] , stringsAsFactors = FALSE)
+  ustate <- unique(statetable)
+  
+  colnames(ustate)[1] <- "id" 
+  colnames(ustate)[2] <- "state" 
+  states <- length(ustate$id)
+  cstate <- 1
+  
+  while(count <= records){
+    while(cstate <= states){
+      
+      currentrec <- ustate$id[cstate]
+      currentstate <- ustate$state[cstate]
+      if(resultframe$id[count]==currentrec){
+        if(resultframe[count, origcolumn]=="ADD") {
+          resultframe[count, origcolumn] <- currentstate
+        }
+        else if (!grepl(currentstate, resultframe[count,origcolumn])){
+          resultframe[count, origcolumn] <- paste(resultframe[count, origcolumn], currentstate, sep = " | ")
+        }
+        
+      }
+      cstate <- cstate +1
+    }
+    cstate = 1
+    count <- count + 1
+  }
+  final <- data.frame(resultframe, stringsAsFactors = FALSE)
+  return(final)
+}
+
+### Using the addColumn function, this function take a dataframe, and applies the addColumn function to all available columns after the first.
+
+combineRows <- function(startframe){
+  uniqueids <- unique(startframe[,1])
+  start <- data.frame(uniqueids, stringsAsFactors = FALSE)
+  totalColumns <- length(startframe)
+  workingColumn <- 2
+  while(workingColumn <= totalColumns){
+    start <- addColumn(start, startframe, workingColumn)
+    colnames(start)[workingColumn] <- colnames(startframe)[workingColumn]
+    workingColumn <- workingColumn+1
+
+  }
+  return(completedTable)
+
+}
