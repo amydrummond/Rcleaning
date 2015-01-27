@@ -1,5 +1,4 @@
-### This function will take a path and file for a csv file (entered in quotes, with / to divide 
-### the path beginning at one's default R path) and an integer
+### This function will take a path and file for a csv file (entered in quotes) and an integer
 ### and will break that file into smaller files of that number of records.
 ### If there are records remaining, then the final file will contain the remaining records. 
 
@@ -14,7 +13,6 @@ strcount <- function(x, pattern, split){
   
 }
 
-### Now the rest.
 
 breakfile <- function(pathfile, recnumber ){
   startfile <- read.csv(pathfile, colClasses = "character")
@@ -35,13 +33,13 @@ breakfile <- function(pathfile, recnumber ){
   
   filenumber = 1
   startrow = 1
-  endrow = 50
+  endrow = recnumber
   totalcolumns = ncol(startfile)
   
   while(filenumber <= fullfiles){
     subfile <- startfile[startrow:endrow, 1:totalcolumns]
     filename <- paste(substr(pathfile,1,startfilename),filenames," ", filenumber,".txt", sep = '')
-    write.table(subfile, filename, sep='\t', row.names = FALSE)
+    write.table(subfile, filename, quote = FALSE, sep='\t', row.names = FALSE)
     filenumber <- filenumber + 1
     startrow <- startrow + recnumber
     endrow <- endrow + recnumber
@@ -50,6 +48,6 @@ breakfile <- function(pathfile, recnumber ){
   
   subfile <- startfile[((fullfiles*recnumber)+1):totalrecords, 1:totalcolumns]
   filename <- paste(substr(pathfile,1,startfilename),filenames," ", filenumber,".txt", sep = '')
-  write.table(subfile, filename, sep='\t', row.names = FALSE)
+  write.table(subfile, filename, sep='\t', row.names = FALSE, quote = FALSE)
   
 }
